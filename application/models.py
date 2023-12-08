@@ -12,8 +12,8 @@ class User(UserMixin, db.Model):
     identity = db.Column(db.String, nullable = False, default = "User", server_default = "User")
     active = db.Column(db.Boolean, server_default = expression.true(), nullable = False)
 
-    # def is_active(self):
-    #     return self.active
+    def is_active(self):
+        return self.active
 
 class Creator(db.Model):
     __tablename__ = "Creator"
