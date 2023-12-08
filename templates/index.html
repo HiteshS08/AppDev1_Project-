@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    Hello {{ user.username }}, Your role is {{ user.identity }}
+    <br>
+    You have logged in with {{user.mail}}
+</body>
+</html>

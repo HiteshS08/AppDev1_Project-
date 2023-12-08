@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Playlist</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        /* Your CSS styles here */
+        body {
+            background: white;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .song-list {
+            gap: 20px;
+        }
+
+        .song-item {
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .song-image {
+            max-width: 100px;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .song-details {
+            flex-grow: 1;
+        }
+
+        .play-button, .add-button {
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            height: 55px;
+            width: 120px; /* Adjusted button width */
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 88%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centering the button */
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .song-item:hover .overlay {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <div class="song-list">
+            {% for song in songs %}
+                <div class="song-item" id="{{ song.sid }}">
+                    <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
+                    <div class="song-details">
+                        <h4>{{ song.sname }}</h4>
+                        <p>Artist: {{ song.cname }}</p>
+                    </div>
+                    <button class="play-button">Play</button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script> -->
+</body>
+
+</html>

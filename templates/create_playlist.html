@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Playlist</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h2>Create Playlist</h2>
+
+        <!-- Form for creating a playlist -->
+        <form method="POST" action="{{ url_for('create_playlist', uid=uid) }}">
+            <label for="playlist_name">Playlist Name:</label>
+            <input type="text" id="playlist_name" name="playlist_name" required>
+            <input type="hidden" name="uid" value="{{uid}}"></input>
+            <button type="submit" class="add-button">Create</button>
+        </form>
+
+        <!-- Display available songs with an overlay for each song -->
+        <div class="song-list">
+            <select name="songs" id="songs" multiple class="songs">
+                {% for song in songs %}
+                    <option class="song-item" value="{song.sid}" >
+                        <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
+                        <div class="song-details">
+                            <h4>{{ song.sname }}</h4>
+                            <p>Artist: {{ song.cname }}</p>
+                        </div>
+                        <button class="play-button">Play</button>
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Indication that the playlist has been created -->
+        {% if playlist_created %}
+            <p>Playlist created successfully!</p>
+        {% endif %}
+    </div>
+
+    <style>
+        body {
+            background: white;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .song-list {
+            gap: 20px;
+        }
+
+        .song-item {
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .song-image {
+            max-width: 100px;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .song-details {
+            flex-grow: 1;
+        }
+
+        .play-button, .add-button {
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            height: 55px;
+            width: 120px; /* Adjusted button width */
+        }
+
+        .song-item:hover .overlay {
+            opacity: 1;
+        }
+
+        .songs {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 200px;
+            overflow-y: auto;
+            display: block;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>
