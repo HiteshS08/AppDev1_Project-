@@ -11,37 +11,40 @@
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <h2>Create Playlist</h2>
-
-        <!-- Form for creating a playlist -->
-        <form method="POST" action="{{ url_for('create_playlist', uid=uid) }}">
-            <label for="playlist_name">Playlist Name:</label>
-            <input type="text" id="playlist_name" name="playlist_name" required>
-            <input type="hidden" name="uid" value="{{uid}}"></input>
-            <button type="submit" class="add-button">Create</button>
+        <h1>Create Your Playlist</h1>
+        <form action="/create_playlist" method="post">
+            <div class="form-group">
+                <label for="playlist_name">Enter Playlist Name:</label>
+                <input type="text" class="form-control" id="playlist_name" name="playlist_name" placeholder="Enter Name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="song_id">Enter Song ID:</label>
+                <input type="number" class="form-control" id="song_id" name="song_id" placeholder="Enter song ID" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Playlist and Add Song</button>
         </form>
-
-        <!-- Display available songs with an overlay for each song -->
+        
+        
         <div class="song-list">
-            <select name="songs" id="songs" multiple class="songs">
-                {% for song in songs %}
-                    <option class="song-item" value="{song.sid}" >
-                        <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
-                        <div class="song-details">
-                            <h4>{{ song.sname }}</h4>
-                            <p>Artist: {{ song.cname }}</p>
-                        </div>
-                        <button class="play-button">Play</button>
-                    </option>
-                {% endfor %}
-            </select>
+            {% for song in songs %}
+                <div class="song-item" id="{{ song.sid }}">
+                    <div class="index-number">{{ loop.index }}</div>
+                    <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
+                    <div class="song-details">
+                        <h4>{{ song.sname }}</h4>
+                        <p>Artist: {{ song.cname }}</p>
+                    </div>
+                    <button class="play-button">Play</button>
+                </div>
+            {% endfor %}
         </div>
-
-        <!-- Indication that the playlist has been created -->
-        {% if playlist_created %}
-            <p>Playlist created successfully!</p>
-        {% endif %}
     </div>
+
+    {% if playlist_created %}
+        <p>Playlist created successfully!</p>
+    {% endif %}
 
     <style>
         body {
@@ -67,6 +70,13 @@
             margin-bottom: 20px;
         }
 
+        .index-number {
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333;
+        }
+
         .song-image {
             max-width: 100px;
             border-radius: 5px;
@@ -77,7 +87,8 @@
             flex-grow: 1;
         }
 
-        .play-button, .add-button {
+        .play-button,
+        .add-button {
             background-color: #333;
             color: #ffffff;
             border: none;
@@ -88,18 +99,20 @@
             width: 120px; /* Adjusted button width */
         }
 
-        .song-item:hover .overlay {
-            opacity: 1;
+        /* Added styles for the form */
+        .form-group {
+            margin-top: 20px;
         }
 
-        .songs {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
+        .form-control {
+            width: 50%;
             border-radius: 5px;
-            height: 200px;
-            overflow-y: auto;
-            display: block;
+        }
+
+        .btn-primary {
+            background-color: #333;
+            border-color: #333;
+            margin-top: 10px;
         }
     </style>
 

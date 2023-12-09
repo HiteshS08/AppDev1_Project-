@@ -2,8 +2,8 @@ from application.models import User, Playlist, Song, PlaylistSong
 from flask import current_app as app
 from application.database import db
 from main import login_manager
-from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_login import LoginManager, login_user, current_user, login_required, logout_user
+from flask import Flask, render_template, redirect, url_for, flash, request, session
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required, logout_user
 from sqlalchemy import or_
 
 @login_manager.user_loader
@@ -13,15 +13,15 @@ def load_user(user_id):
 
 @app.route("/")
 def start():
-    return redirect(url_for('login'))
+    return render_template('index.html')
 
 @app.route("/<id>")
 def default(id):
     user = User.query.filter_by(id = id).first()
     return render_template("index.html", user = user)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/user_login', methods=['GET', 'POST'])
+def user_login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -34,11 +34,39 @@ def login():
                 flash('Login successful!', 'success')
                 return redirect(url_for('home', id=user.id))
             else:
-                flash('User ID is not valid.', 'danger')
+                flash('Invalid User ID', 'danger')
+                return redirect(url_for('user_login'))
         else:
-            flash('Login failed. Please check your username and password.', 'danger')
+            flash('Login failed. Please check your username and password', 'danger')
+            return redirect(url_for('user_login'))  
+        
+    return render_template('user_login.html')
 
-    return render_template('login.html')
+@app.route('/admin_login', methods = ['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username = username).first()
+
+        if user.identity != "Admin":
+            flash('Admin Authentication Failed', 'danger')
+            return redirect(url_for('admin_login'))
+
+        if user and user.pwd == password:
+            login_user(user)
+            flash('Login successful!', 'success')
+            return redirect(url_for('home', id=user.id))
+
+    return render_template('admin_login.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out', 'success')
+    return redirect('/')
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -49,7 +77,7 @@ def register():
         user = User(username = username, pwd = password, mail = mail)
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('login'))
+        return redirect(url_for('user_login'))
     return render_template('register.html')
 
 @app.route('/home/<int:id>')
@@ -69,13 +97,13 @@ def profile():
 
 @app.route('/playlist/<int:playlist_id>')
 def view_playlist(playlist_id):
-    playlist = Playlist.query.get(playlist_id)
+    playlist = Playlist.query.filter_by(id = playlist_id).first()
     if playlist:
         songs = playlist.songs
         return render_template('playlist.html',User = current_user, playlist=playlist, songs=songs)
     else:
         flash('Playlist not found', 'danger')
-        return redirect(url_for('home'))
+        return redirect(url_for('home', id = current_user.id))
 
 
 @app.route('/create_playlist', methods=['GET', 'POST'])
@@ -86,36 +114,31 @@ def create_playlist():
     playlist_name = None
 
     if request.method == 'POST':
-        playlist_name =  request.form.get('playlist_name')
         user_id = current_user.id
+        playlist_name =  request.form.get('playlist_name')
+        song_id = request.form.get('song_id')
+
+        if not playlist_name:
+            flash('Playlist name is required.', 'error')
+            return redirect(url_for('create_playlist'))
+        
+        session['playlist_name'] = playlist_name
         playlist = Playlist.query.filter_by(name=playlist_name, user=user_id).first()
 
         if not playlist:
             playlist = Playlist(name=playlist_name, user=user_id)
             db.session.add(playlist)
             db.session.commit()
+            playlist_created = True
 
-        playlist_created = True
-
-    return render_template("create_playlist.html", songs=songs,User = current_user, playlist_created=playlist_created, playlist_name=playlist_name)
-
-
-@app.route('/add_song/<int:playlist_id>', methods=['GET', 'POST'])
-@login_required
-def add_song(playlist_id):
-    playlist = Playlist.query.get(playlist_id)
-    songs = Song.query.all()
-    playlist_updated = False
-
-    if request.method == 'POST':
-        song_id = request.form.get("song_id")
-        song = Song.query.get(song_id)
-
-        if song not in playlist.songs:
-            playlist.songs.append(song)
+        if song_id:
+            playlist_song = PlaylistSong(playlist_id = playlist.id, song_id = song_id)
+            db.session.add(playlist_song)
             db.session.commit()
-            playlist_updated = True
-    return redirect(url_for('create_playlist'))
+
+        
+
+    return render_template("create_playlist.html", songs=songs, playlist_created=playlist_created, playlist_name=playlist_name)
 
     
 @app.route('/search')
