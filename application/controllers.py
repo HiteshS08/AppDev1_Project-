@@ -96,7 +96,7 @@ def profile():
     return render_template('profile.html')
 
 @app.route('/playlist/<int:playlist_id>')
-def view_playlist(playlist_id):
+def playlist(playlist_id):
     playlist = Playlist.query.filter_by(id = playlist_id).first()
     if playlist:
         songs = playlist.songs
@@ -105,6 +105,47 @@ def view_playlist(playlist_id):
         flash('Playlist not found', 'danger')
         return redirect(url_for('home', id = current_user.id))
 
+
+@app.route('/<int:playlist_id>/add_song', methods=['GET', 'POST'])
+def add_song(playlist_id):
+    songs = Song.query.all()
+    playlist = Playlist.query.filter_by(id = playlist_id).first()
+
+    if request.method == 'POST':
+        song_id = request.form.get('song_id')
+        if song_id:
+            new_song = PlaylistSong(playlist_id = playlist_id, song_id = song_id)
+            db.session.add(new_song)
+            db.session.commit()
+        else:
+            flash('Song ID is Invalid', 'error')
+            redirect(url_for('add_song', playlist_id = playlist_id))
+        
+        return redirect(url_for('playlist', playlist_id = playlist.id))
+    
+    return render_template('add_song.html', songs = songs, User = current_user, playlist = playlist)
+
+
+@app.route('/<int:playlist_id>/remove_song', methods=['GET', 'POST'])
+@login_required
+def remove_song(playlist_id):
+    playlist = Playlist.query.filter_by(id = playlist_id).first()
+    songs = Song.query.all()
+
+    if request.method == 'POST':
+        song_id = request.form.get('song_id')
+        playlist_song = PlaylistSong.query.filter_by(playlist_id = playlist_id, song_id = song_id).first()
+        if playlist_song:
+            db.session.delete(playlist_song)
+            db.session.commit()
+            flash('Song deleted successfully!', 'success')
+        else:
+            flash('Song not found in the playlist', 'danger')
+            return redirect(url_for('remove_song', playlist_id = playlist_id))
+
+        return redirect(url_for('playlist', playlist_id = playlist.id))
+    
+    return render_template('remove_song.html', songs = songs, User = current_user, playlist = playlist)
 
 @app.route('/create_playlist', methods=['GET', 'POST'])
 @login_required
@@ -137,9 +178,22 @@ def create_playlist():
             db.session.commit()
 
         
-
     return render_template("create_playlist.html", songs=songs, playlist_created=playlist_created, playlist_name=playlist_name)
 
+
+@app.route('/delete_playlist/<int:playlist_id>')
+@login_required
+def delete_playlist(playlist_id):
+    playlist = Playlist.query.get(playlist_id)
+    if playlist:
+        db.session.delete(playlist)
+        db.session.commit()
+        db.session.refresh(playlist)
+        flash('Playlist deleted successfully', 'success')
+    else:
+        flash('Playlist not found', 'danger')
+
+    return redirect(url_for('home', id=current_user.id))
     
 @app.route('/search')
 def search():

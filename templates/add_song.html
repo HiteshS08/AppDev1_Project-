@@ -1,53 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a New Song</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Your Playlist</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h1>Add Song</h1>
+        <form action="{{ url_for('add_song', playlist_id=playlist.id) }}" method="post">
+            <label for="song_id">Enter Song ID:</label>
+            <input type="number" class="form-control" id="song_id" name="song_id" placeholder="Enter song ID" required>
+            
+            <button type="submit" class="btn btn-primary">Add Song</button>
+        </form>    
+        <div class="song-list">
+            {% for song in songs %}
+                <div class="song-item" id="{{ song.sid }}">
+                    <div class="index-number">{{ loop.index }}</div>
+                    <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
+                    <div class="song-details">
+                        <h4>{{ song.sname }}</h4>
+                        <p>Artist: {{ song.cname }}</p>
+                    </div>
+                    <button class="play-button">Play</button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: sans-serif;
+            background: white;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .song-list {
+            gap: 20px;
+        }
+
+        .song-item {
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .index-number {
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .song-image {
+            max-width: 100px;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .song-details {
+            flex-grow: 1;
+        }
+
+        .play-button,
+        .add-button {
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            height: 55px;
+            width: 120px; /* Adjusted button width */
+        }
+
+        /* Added styles for the form */
+        .form-group {
+            margin-top: 20px;
         }
 
         .form-control {
-            background-color: #343a40;
-            border-color: #495057;
-            color: #fff;
+            width: 50%;
+            border-radius: 5px;
         }
 
         .btn-primary {
             background-color: #333;
             border-color: #333;
+            margin-top: 10px;
         }
     </style>
-</head>
-<body>
-    { % include navbar.html %}
-    <div class="container mt-5">
-        <h1>Create a New Song</h1>
-        <form action="#">
-            <div class="mb-3">
-                <label for="song_name" class="form-label">Song Name:</label>
-                <input type="text" class="form-control" id="song_name" name="song_name" required>
-            </div>
 
-            <div class="mb-3">
-                <label for="song_image" class="form-label">Song Image URL:</label>
-                <input type="url" class="form-control" id="song_image" name="song_image">
-            </div>
-
-            <div class="mb-3">
-                <label for="song_lyrics" class="form-label">Lyrics:</label>
-                <textarea class="form-control" id="song_lyrics" name="song_lyrics" rows="5" required></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Save Song</button>
-        </form>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
 </html>

@@ -11,22 +11,13 @@
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <h1>Create Your Playlist</h1>
-        <form action="{{ url_for('create_playlist') }}" method="post">
-            <div class="form-group">
-                <label for="playlist_name">Enter Playlist Name:</label>
-                <input type="text" class="form-control" id="playlist_name" name="playlist_name" placeholder="Enter Name" required>
-            </div>
+        <h1>Add Song</h1>
+        <form action="{{ url_for('remove_song', playlist_id=playlist.id) }}" method="post">
+            <label for="song_id">Enter Song ID:</label>
+            <input type="number" class="form-control" id="song_id" name="song_id" placeholder="Enter song ID" required>
             
-            <div class="form-group">
-                <label for="song_id">Enter Song ID:</label>
-                <input type="number" class="form-control" id="song_id" name="song_id" placeholder="Enter song ID" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Create Playlist and Add Song</button>
-        </form>
-        
-        
+            <button type="submit" class="btn btn-primary">Remove Song</button>
+        </form>    
         <div class="song-list">
             {% for song in songs %}
                 <div class="song-item" id="{{ song.sid }}">
@@ -41,10 +32,6 @@
             {% endfor %}
         </div>
     </div>
-
-    {% if playlist_created %}
-        <p>Playlist created successfully!</p>
-    {% endif %}
 
     <style>
         body {
