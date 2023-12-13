@@ -1,10 +1,13 @@
-from application.models import User, Playlist, Song, PlaylistSong
+from application.models import User, Playlist, Song, PlaylistSong, Creator
 from flask import current_app as app
 from application.database import db
 from main import login_manager
-from flask import Flask, render_template, redirect, url_for, flash, request, session
+from flask import Flask, render_template, redirect, url_for, flash, request, session, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required, logout_user
 from sqlalchemy import or_
+import os
+
+UPLOAD_FOLDER = 'static'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -28,17 +31,20 @@ def user_login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and user.pwd == password:
-            if user.id is not None:  
-                login_user(user)
-                flash('Login successful!', 'success')
-                return redirect(url_for('home', id=user.id))
+        if user.disabled == False:
+            if user and user.pwd == password:
+                if user.id is not None:  
+                    login_user(user)
+                    return redirect(url_for('home', id=user.id))
+                else:
+                    flash('Invalid User ID', 'danger')
+                    return redirect(url_for('user_login'))
             else:
-                flash('Invalid User ID', 'danger')
-                return redirect(url_for('user_login'))
+                flash('Login failed. Please check your username and password', 'danger')
+                return redirect(url_for('user_login'))  
+        
         else:
-            flash('Login failed. Please check your username and password', 'danger')
-            return redirect(url_for('user_login'))  
+            flash("Your Account has been disabled", "danger")
         
     return render_template('user_login.html')
 
@@ -55,7 +61,6 @@ def admin_login():
 
         if user and user.pwd == password:
             login_user(user)
-            flash('Login successful!', 'success')
             return redirect(url_for('home', id=user.id))
 
     return render_template('admin_login.html')
@@ -84,9 +89,9 @@ def register():
 @login_required
 def home(id = None):
     if id is not None:
-        playlists = Playlist.query.filter_by(user=id).all()
+        playlists = Playlist.query.filter_by(user_id = id).all()
     else:
-        playlists = Playlist.query.filter_by(user=current_user.id).all()
+        playlists = Playlist.query.filter_by(user_id = current_user.id).all()
 
     songs = Song.query.all()
     return render_template('home.html',User = current_user, id = current_user.id, songs=songs, playlists=playlists)
@@ -139,6 +144,7 @@ def remove_song(playlist_id):
             db.session.delete(playlist_song)
             db.session.commit()
             flash('Song deleted successfully!', 'success')
+            redirect(url_for('playlist', id = current_user.id))
         else:
             flash('Song not found in the playlist', 'danger')
             return redirect(url_for('remove_song', playlist_id = playlist_id))
@@ -189,11 +195,19 @@ def delete_playlist(playlist_id):
         db.session.delete(playlist)
         db.session.commit()
         db.session.refresh(playlist)
-        flash('Playlist deleted successfully', 'success')
     else:
         flash('Playlist not found', 'danger')
 
     return redirect(url_for('home', id=current_user.id))
+
+
+@app.route('/lyrics/<int:song_id>')
+def get_lyrics(song_id):
+    song = Song.query.filter_by(sid = song_id)
+    name = song.sname
+    filename = f"{name}.txt"
+    return send_from_directory('static/lyrics', filename)
+
     
 @app.route('/search')
 def search():
@@ -205,3 +219,58 @@ def search():
         )
     ).all()
     return render_template('search.html', songs = songs, User = current_user, id = current_user.id)
+
+
+@app.route('/creator_register/<int:id>', methods = ['GET', 'POST'])
+def creator_registor(id):
+    user = User.query.get(id)
+    
+    if user and user.id in Creator:
+        return redirect(url_for('creator', id = user.id))
+    
+    cname = request.form.get('creator_name')
+    password = request.form.get('password')
+
+    if user.pwd == password:
+        creator = Creator(cname = cname)
+        db.session.add(creator)
+        db.session.commit()
+        redirect(url_for('creator', id = user.id))
+
+    return render_template('creator_register.html', user = current_user, id = current_user.id)
+
+@app.route('/<int:id>/creator', methods = ['GET', 'POST'])
+@login_required
+def creator(id):
+    creator = Creator.query.get(id)
+    songs = Song.query.filter_by(cname = creator.cname , flagged = False).all()
+    flagged_songs = Song.query.filter_by(cname = creator.cname, flagged = True).all()
+    return render_template('creator.html', songs = songs, flagged_songs = flagged_songs)
+
+
+@app.route('/upload_song', methods = ['GET','POST'])
+def upload_song():
+    song_name = request.form.get('song_name')
+    song_lyrics = request.form.get('song_lyrics')
+    song_image = request.files['song_image']
+
+    lyrics_path = os.path.join('static', 'lyrics', f'{song_name}.txt')
+    with open(lyrics_path, 'w') as lyrics_file:
+        lyrics_file.write(song_lyrics)
+
+    if song_image.filename != "":
+        image_path = os.path.join('static', f'{song_name}.jpg')
+        song_image.save(image_path)
+    else:
+        flash("Invalid file", 'error')
+        return redirect(url_for('upload_song'))
+
+    user = User.query.filter_by(id = current_user.id)
+    cname = user.username
+
+    new_song = Song(sname = song_name, cname = cname)
+    db.session.add(new_song)
+    db.session.commit()
+
+    return render_template('upload_song.html')
+    

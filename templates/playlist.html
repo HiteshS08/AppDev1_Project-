@@ -84,6 +84,14 @@
                         <p>Artist: {{ song.cname }}</p>
                     </div>
                     <button class="play-button">Play</button>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="lyricsDropdown{{ song.sid }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            View Lyrics
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="lyricsDropdown{{ song.sid }}">
+                            <a class="dropdown-item" href="{{ url_for('get_lyrics', song_id=song.sid) }}" target="_blank">Read Lyrics</a>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
         </div>
@@ -92,7 +100,6 @@
             <a href="{{ url_for('remove_song', playlist_id=playlist.id) }}" class="btn btn-danger">Remove Song</a>
             <a href="{{ url_for('delete_playlist', playlist_id=playlist.id) }}" class="btn btn-warning">Delete Playlist</a>
         </div>
-
     </div>
 
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
