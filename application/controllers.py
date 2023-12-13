@@ -256,7 +256,7 @@ def creator_registor(id):
 
     return render_template('creator_register.html', user = current_user, id = current_user.id)
 
-@app.route('/<int:id>/creator', methods = ['GET', 'POST'])
+@app.route('/creator/<int:id>', methods = ['GET', 'POST'])
 @login_required
 def creator(id):
     creator = Creator.query.get(id)
@@ -290,9 +290,15 @@ def upload_song():
         if song_image.filename != "":
             image_path = os.path.join('static', f'{song_name}.jpg')
             song_image.save(image_path)
-            return redirect("/creator")
+            song = Song(sname = song_name, cname = cname)
+
+            db.session.add(song)
+            db.session.commit()
+            return redirect(f"/creator/{current_user.id}")
         else:
             flash("Invalid file", 'error')
             return redirect(url_for('upload_song'))
+        
+
 
         
