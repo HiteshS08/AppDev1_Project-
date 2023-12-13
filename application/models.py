@@ -16,7 +16,8 @@ class User(UserMixin, db.Model):
 
 class Creator(db.Model):
     __tablename__ = "Creator"
-    id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
     cname = db.Column(db.String, unique=True, nullable=False)
     disabled = db.Column(db.Boolean, default=False, nullable=False) 
     songs = db.relationship('Song', backref='creator', lazy=True)

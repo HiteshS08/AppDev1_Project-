@@ -78,6 +78,7 @@
         <div class="song-list">
             {% for song in songs %}
                 <div class="song-item" id="{{ song.sid }}">
+                    
                     <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
                     <div class="song-details">
                         <h4>{{ song.sname }}</h4>

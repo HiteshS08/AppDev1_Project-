@@ -21,7 +21,7 @@
 		
         <div class="screen">
             <div class="screen__content">
-                <form class="login" action="/creator_register" method="POST">
+                <form class="login" action="/creator_register/{{current_user.id}}" method="POST">
                     <div class="login__field">
                         <i class="login__icon fas fa-user"></i>
                         <input type="text" class="login__input" name="creator_name" placeholder="Enter Creator name" required>

@@ -104,7 +104,13 @@ def profile():
 def playlist(playlist_id):
     playlist = Playlist.query.filter_by(id = playlist_id).first()
     if playlist:
-        songs = playlist.songs
+        playlistSongs = playlist.songs
+        songs = []
+        for playlistSong in playlistSongs:
+            song = Song.query.filter_by(sid = playlistSong.id).first()
+            songs.append(song)
+        print(songs)
+        
         return render_template('playlist.html',User = current_user, playlist=playlist, songs=songs)
     else:
         flash('Playlist not found', 'danger')
@@ -169,11 +175,13 @@ def create_playlist():
             flash('Playlist name is required.', 'error')
             return redirect(url_for('create_playlist'))
         
-        session['playlist_name'] = playlist_name
-        playlist = Playlist.query.filter_by(name=playlist_name, user=user_id).first()
+        
+        playlist = Playlist.query.filter_by(name=playlist_name, user_id = user_id).first()
+
+        
 
         if not playlist:
-            playlist = Playlist(name=playlist_name, user=user_id)
+            playlist = Playlist(name=playlist_name, user_id = user_id)
             db.session.add(playlist)
             db.session.commit()
             playlist_created = True
@@ -190,7 +198,7 @@ def create_playlist():
 @app.route('/delete_playlist/<int:playlist_id>')
 @login_required
 def delete_playlist(playlist_id):
-    playlist = Playlist.query.get(playlist_id)
+    playlist = Playlist.query.filter_by(id = playlist_id).first()
     if playlist:
         db.session.delete(playlist)
         db.session.commit()
@@ -224,18 +232,27 @@ def search():
 @app.route('/creator_register/<int:id>', methods = ['GET', 'POST'])
 def creator_registor(id):
     user = User.query.get(id)
+    if request.method == "POST":
+        if user.pwd == request.form.get('password'):
+            cname = request.form.get('creator_name')
+            creator = Creator(cname = cname, user_id = user.id)
+            db.session.add(creator)
+            db.session.commit()
+            return redirect(url_for('creator', id = user.id))
+
+        
+        
     
-    if user and user.id in Creator:
-        return redirect(url_for('creator', id = user.id))
+    creator = Creator.query.filter_by(user_id = user.id).first()
+    if creator:
+        return redirect(url_for('creator', id = creator.user_id))
+    
+    
     
     cname = request.form.get('creator_name')
     password = request.form.get('password')
 
-    if user.pwd == password:
-        creator = Creator(cname = cname)
-        db.session.add(creator)
-        db.session.commit()
-        redirect(url_for('creator', id = user.id))
+    
 
     return render_template('creator_register.html', user = current_user, id = current_user.id)
 
@@ -250,27 +267,32 @@ def creator(id):
 
 @app.route('/upload_song', methods = ['GET','POST'])
 def upload_song():
-    song_name = request.form.get('song_name')
-    song_lyrics = request.form.get('song_lyrics')
-    song_image = request.files['song_image']
+    if request.method == "GET":
 
-    lyrics_path = os.path.join('static', 'lyrics', f'{song_name}.txt')
-    with open(lyrics_path, 'w') as lyrics_file:
-        lyrics_file.write(song_lyrics)
-
-    if song_image.filename != "":
-        image_path = os.path.join('static', f'{song_name}.jpg')
-        song_image.save(image_path)
-    else:
-        flash("Invalid file", 'error')
-        return redirect(url_for('upload_song'))
-
-    user = User.query.filter_by(id = current_user.id)
-    cname = user.username
-
-    new_song = Song(sname = song_name, cname = cname)
-    db.session.add(new_song)
-    db.session.commit()
-
-    return render_template('upload_song.html')
+        return render_template('upload_song.html')
     
+    if request.method == "POST":
+        user = User.query.filter_by(id = current_user.id).first()
+        cname = user.username
+        
+
+        song_name = request.form.get('song_name')
+        song_lyrics = request.form.get('song_lyrics')
+        song_image = request.files['song_image']
+       
+
+        
+
+        lyrics_path = os.path.join('static', 'lyrics', f'{song_name}.txt')
+        with open(lyrics_path, 'w') as lyrics_file:
+            lyrics_file.write(song_lyrics)
+
+        if song_image.filename != "":
+            image_path = os.path.join('static', f'{song_name}.jpg')
+            song_image.save(image_path)
+            return redirect("/creator")
+        else:
+            flash("Invalid file", 'error')
+            return redirect(url_for('upload_song'))
+
+        

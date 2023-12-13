@@ -76,7 +76,7 @@
     {% include 'navbar.html' %}
     <div class="container mt-5">
         <h1>Upload a New Song</h1>
-        <form action="{{ url_for('upload_song') }}" method="post" enctype="multipart/form-data">
+        <form action="/upload_song" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="song_name" class="form-label">Song Name:</label>
                 <input type="text" class="form-control" id="song_name" name="song_name" required>
