@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .dashboard-container {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #333; 
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-section {
+            flex: 1;
+        }
+
+        .song-item {
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .index-number {
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .song-image {
+            max-width: 100px;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .song-details {
+            flex-grow: 1;
+        }
+
+        .play-button, .add-button {
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            height: 35px;
+            width: 100px; 
+        }
+        .creator-item, .user-item {
+            background-color: #ffffff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .play-button, .flag-button, .whitelist-button {
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+
+        .whitelist-button {
+            background-color: #be0808; 
+        }
+    </style>
+</head>
+<body>
+{% include 'navbar.html' %}
+{% block content %}
+    <h1>Admin Dashboard</h1>
+    <div class="dashboard-container">
+        <div class="dashboard-section">
+            <h1>Total Users</h1>
+            <h2>{{ total_users }}</h2>
+        </div>
+        <div class="dashboard-section">
+            <h1>Total Songs</h1>
+            <h2>{{ total_songs }}</h2>
+        </div>
+        <div class="dashboard-section">
+            <h1>Total Creators</h1>
+            <h2>{{ total_creators }}</h2>
+        </div>
+    </div>
+
+
+    <h2>All Songs</h2>
+    <div class="song-list">
+        {% for song in songs %}
+            <div class="song-item" id="{{ song.sid }}">
+                <div class="index-number">{{ song.sid }}</div>
+                <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
+                <div class="song-details">
+                    <h4>{{ song.sname }}</h4>
+                    <p>Artist: {{ song.cname }}</p>
+                </div>
+                <a href="/play/{{song.sid}}" class="play-button">Play</a>
+                <a href="/flag_song/{{song.sid}}" class="play-button">{% if song.flagged %}Flagged{% else %}Flag{% endif %}</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h2>All Users</h2>
+    <div class="user-list">
+        {% for user in users %}
+            <div class="user-item" id="{{ user.id }}">
+                <h4>{{ user.username }}</h4>
+                <p>Email: {{ user.mail }}</p>
+                <a href="/flag_user/{{ user.id }}" class="flag-button">
+                    {% if user.disabled %}Remove Flag{% else %}Flag{% endif %}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+
+    <h2>All Creators</h2>
+    <div class="creator-list">
+        {% for creator in creators %}
+            <div class="creator-item">
+                <h4>{{ creator.cname }}</h4>
+                <p>Whitelisted: {% if creator.disabled %}Yes{% else %}No{% endif %}</p>
+                <a href="/whitelist_creator/{{ creator.id }}" class="whitelist-button">
+                    {% if creator.disabled %}Remove from Whitelist{% else %}Whitelist{% endif %}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+</body>
+</html>

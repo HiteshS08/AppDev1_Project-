@@ -17,6 +17,15 @@
                 margin-top: 20px;
                 margin-right: 1px;
             }
+
+            .form-group {
+            margin-top: 20px;
+            }
+
+            .form-control {
+                width: 50%;
+                border-radius: 5px;
+            }
     
             .new-songs-container, .playlist-container, .album-container {
                 background-color: #ffffff;
@@ -85,6 +94,11 @@
             <div class="mb-3">
                 <label for="song_image" class="form-label">Song Image:</label>
                 <input type="file" class="form-control" id="song_image" name="song_image" accept="image/*" required>
+            </div>
+
+            <div class="form-group">
+                <label for="song_file">Choose Song File (MP3):</label>
+                <input type="file" class="form-control-file" id="song_file" name="song_file" accept=".mp3">
             </div>
 
             <div class="mb-3">

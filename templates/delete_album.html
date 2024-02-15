@@ -4,47 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Playlist</title>
+    <title>Delete Song</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <h1>Create Your Playlist</h1>
-        <form action="{{ url_for('create_playlist') }}" method="post">
-            <div class="form-group">
-                <label for="playlist_name">Enter Playlist Name:</label>
-                <input type="text" class="form-control" id="playlist_name" name="playlist_name" placeholder="Enter Name" required>
-            </div>
+        <h1>Delete Album</h1>
+        <form action="/delete_album" method="post">
+            <label for="song_id">Enter Album ID:</label>
+            <input type="number" class="form-control" id="album_id" name="album_id" placeholder="Enter album ID" required>
             
-            <div class="form-group">
-                <label for="song_id">Enter Song ID:</label>
-                <input type="number" class="form-control" id="song_id" name="song_id" placeholder="Enter song ID" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Create Playlist and Add Song</button>
-        </form>
-        
-        
+            <button type="submit" class="btn btn-primary">Delete Album</button>
+        </form>    
         <div class="song-list">
-            {% for song in songs %}
-                <div class="song-item" id="{{ song.sid }}">
-                    <div class="index-number">{{ song.sid}}</div>
-                    <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
-                    <div class="song-details">
-                        <h4>{{ song.sname }}</h4>
-                        <p>Artist: {{ song.cname }}</p>
+            {% for album in albums  %}
+                    <div class="index-number">{{ album.id }}
+                        {{ album.name }}
                     </div>
-                    <a href="/play/{{song.sid}}" class="play-button">Play</a>
                 </div>
             {% endfor %}
         </div>
     </div>
-
-    {% if playlist_created %}
-        <p>Playlist created successfully!</p>
-    {% endif %}
 
     <style>
         body {
@@ -68,6 +50,27 @@
             display: flex;
             position: relative;
             margin-bottom: 20px;
+        }
+        .new-songs-container, .playlist-container, .album-container {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1440px; 
+            overflow-x:auto; 
+            white-space: nowrap;
+            margin-right: 1px;
+        }
+
+        .playlist-item, .album-item, .song-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
         }
 
         .index-number {

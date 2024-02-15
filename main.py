@@ -28,10 +28,15 @@ app, api = create_app()
 login_manager = LoginManager(app)
 
 from application.controllers import *
+from application.API import *
+api.add_resource(SignupAPI,"/api/signup/<user_id>")
+api.add_resource(PlaylistAPI, "/api/playlist/<id>")
+api.add_resource(AlbumAPI, "/api/album/<id>")
+api.add_resource(SongAPI, "/api/song/<sid>")
+api.add_resource(CreatorAPI, "/api/creator/<id>")
 
 if __name__ == "__main__":
     app.run(
         debug = True
     )
 
-# hello hello hi hi

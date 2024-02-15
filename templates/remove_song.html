@@ -21,13 +21,13 @@
         <div class="song-list">
             {% for song in songs %}
                 <div class="song-item" id="{{ song.sid }}">
-                    <div class="index-number">{{ loop.index }}</div>
+                    <div class="index-number">{{ song.sid }}</div>
                     <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
                     <div class="song-details">
                         <h4>{{ song.sname }}</h4>
                         <p>Artist: {{ song.cname }}</p>
                     </div>
-                    <button class="play-button">Play</button>
+                    <a href="/play/{{song.sid}}" class="play-button">Play</a>
                 </div>
             {% endfor %}
         </div>
@@ -83,10 +83,9 @@
             border-radius: 5px;
             cursor: pointer;
             height: 55px;
-            width: 120px; /* Adjusted button width */
+            width: 120px; 
         }
 
-        /* Added styles for the form */
         .form-group {
             margin-top: 20px;
         }

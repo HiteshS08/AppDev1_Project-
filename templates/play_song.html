@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Song</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0; 
+        }
+
+        .playback-container {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 50%; 
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .lyrics-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 50%; 
+            float: right; 
+            overflow-y: auto;
+            max-height: 515px
+        }
+
+        .play-container {
+            width: 100%;
+        }
+
+        .song-info {
+            margin-bottom: 20px;
+        }
+
+        .song-image {
+            max-width: 300px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .player-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        audio {
+            width: 100%;
+        }
+
+        pre {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <div class="playback-container">
+            <div class="play-container">
+                <div class="song-info">
+                    <h2>{{ song.sname }}</h2>
+                    <p>Artist: {{ song.cname }}</p>
+                </div>
+                <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image"
+                    class="song-image">
+                <div class="player-container">
+                    <audio controls>
+                        <source src="{{ url_for('static', filename='music/' + song.sname + '.mp3') }}" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </div>
+        <div class="lyrics-container">
+            <h3>Lyrics</h3>
+            <pre>{{ song.lyrics }}</pre>
+        </div>
+    </div>
+</body>
+
+</html>

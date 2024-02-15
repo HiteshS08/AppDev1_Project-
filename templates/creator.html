@@ -70,9 +70,9 @@
         <h1>Creator Page</h1>
         <div class="btn-container">
             <a href="{{ url_for('upload_song') }}" class="play-button">Upload Song</a>
-            <button class="bplay-button">Delete Song</button>
-            <button class="play-button">Add Album</button>
-            <button class="play-button">Delete Album</button>
+            <a href="/delete_song/{{current_user.id}}" class="play-button">Delete Song</a>
+            <a href="/create_album" class="play-button">Add Album</a>
+            <a href="/delete_album" class="play-button">Delete Album</a>
         </div>
     </div>
     <hr>
@@ -85,17 +85,34 @@
                     <div class="song-details">
                         <h4>{{ song.sname }}</h4>
                     </div>
-                    <button class="play-button">Play</button>
+                    <a href="/play/{{song.sid}}" class="play-button">Play</a>
                 </div>
             {% endfor %}
-
+        </div>
+        <hr>
+        <h2>Albums</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="album-container">
+                    <h2>Latest Albums</h2>
+                    {% for album in albums %}
+                        <div class="album-item">
+                            <a href="/album/{{album.id}}" class="add-button">{{ album.name }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    <hr>
+    <h2>Flagged Songs</h2>
+        <div class="song-list">
             {% for song in flagged_songs %}
                 <div class="song-item" id="{{ song.sid }}">
                     <img src="{{ url_for('static', filename=song.sname + '.jpg') }}" alt="{{ song.sname }} Image" class="song-image">
                     <div class="song-details">
                         <h4>{{ song.sname }}</h4>
                     </div>
-                    <button class="play-button">Play</button>
+                    <a href="/play/{{song.sid}}" class="play-button">Play</a>
                 </div>
             {% endfor %}
         </div>
